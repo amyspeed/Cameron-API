@@ -1,2 +1,10 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: eujvchvtX7Owa/iAHaURAByYOCUSDHo7bXGyZ9a9lCatyRVWdY81xMbTDyri6vgxBhkvd1q1EZS6GxmvmCme6VCWAyNWUntJfPNl2GyQQl+vqzOXod0vnQwMQPFKo/k8fOvQrEXU0eh6zCUXcQmAc59WEPES/vhb3ZNbq1fAJnbF+klQHAJytSHlMV+gYSSJ38pzFZd/CMB5KNzmA/HP33XdifS7OG9xKDUU5MKku0PKboO0cwV/iN4a8kJPJmB/iUyr9H6nozk6a8z9xvhzYhxJXMO1tJOGr9iPR8wl+jkFWuax4BQ918qx8tQqEBUNwfGvHgx10pxdvDWOIns7cmO8OIQ4u7GZ/mPxkttm3CtZiiUvIor/zx+pVJSrqftcyRNqSPRhY3gO/6lC47lT0CpONAuw1SE0Rz+IBx79eyYN+DaA1iNhk09cAouPA6w8OiXW2odvg6X5TWSfMtY38sDL9sUpVpHGJAW8BeJyIEfoNNqoaK2cgj/quLDqYNZmAnBJldIhYEG7V9cIkdJQs5+fGS2YuDKQEZ1JncZNd8gC+CHU+lc+cv4+ApOAtporO58XSg3TOXg19MBJ9OFiIKoE1bq1wTSsEJIHfJJgYdJy1Ydak5B5ZlVVjYP4nXMaE5yHEk7/LX369T7gp+GLeT9oMEXMrOqrZt0RW7R97fU=
+  app: Cameron-API
+  on:
+    repo: amyspeed/Cameron-API
+  skip_cleanup: 'true'
