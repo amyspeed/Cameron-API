@@ -3,9 +3,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
+
 const cors = require('cors');
 
-const { PORT, EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_TO } = require('./config');
+const { PORT, EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_TO, MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID } = require('./config');
+
+const Mailchimp = require('mailchimp-api-v3');
 
 const app = express();
 
@@ -19,45 +22,84 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/v1', (req,res) => {
-  var data = req.body;
+    const data = req.body;
 
-  let transporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: 465,
-    secure: true,
-    auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
+    // Does the user want to subscribe to list? (data.signMeUp is true)
+    // If so, send to Mailchimp API
+    if (data.signMeUp) {
+        const mailchimp = new Mailchimp(MAILCHIMP_API_KEY);
+        console.log('User opted IN to MailChimp List')
+        const mcData = {
+            members: [
+                {
+                    email_address: data.email,
+                    status: 'subscribed',
+                    merge_fields: {
+                        FNAME: data.firstName,
+                        LNAME: data.lastName
+                    }
+                }
+            ]
+        }
+
+        mailchimp.post({
+            path: `lists/${MAILCHIMP_LIST_ID}`,
+            body: mcData
+        })
+        .then((response) => {
+            if(response.statusCode === 200) {
+                console.log('MailChimp success');
+            }
+        })
+        .catch(err => {
+            console.log('MailChimp ERROR');
+            throw err;
+        })
     }
-});
+    else {
+        console.log('User opted OUT of MailChimp List')
+    }
 
-var mailOptions = {
-  from: data.email,
-  to: EMAIL_TO,
-  subject: data.subject,
-  html: `<p>${data.firstName} ${data.lastName}</p>
-          <p>${data.email}</p>
-          <p>${data.message}</p>`
-};
+    // Send the email to Cameron
+    let transporter = nodemailer.createTransport({
+        host: EMAIL_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+            user: EMAIL_USER,
+            pass: EMAIL_PASS
+        }
+    });
 
-transporter.sendMail(mailOptions,
-    (error, response) => {
-        if (error) {
-            console.log(data);
-            console.log(mailOptions);
-            console.log('ERROR')
-            console.log(error)
-            res.send(error)
-        }
-        else {
-            console.log(data);
-            console.log(mailOptions);
-            console.log('SUCCESS')
-            res.send('Success')
-        }
+    const mailOptions = {
+    from: data.email,
+    to: EMAIL_TO,
+    subject: data.subject,
+    html: `<p>${data.firstName} ${data.lastName}</p>
+            <p>${data.email}</p>
+            <p>${data.message}</p>`
+    };
+
+    transporter.sendMail(mailOptions,
+        (error, response) => {
+            if (error) {
+                console.log(data);
+                console.log(mailOptions);
+                console.log('ERROR')
+                console.log(error)
+                res.send(error)
+            }
+            else {
+                console.log(data);
+                console.log(mailOptions);
+                console.log('SUCCESS')
+                res.send('Success')
+            }
         transporter.close();
     });
 });
+
+
 
 app.use('*', function (req, res) {
     res.status(404).json({ message: `Not Found` });
