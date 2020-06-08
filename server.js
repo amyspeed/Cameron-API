@@ -75,9 +75,11 @@ app.post('/api/v1', (req,res) => {
     from: data.email,
     to: EMAIL_TO,
     subject: data.subject,
-    html: `<p>${data.firstName} ${data.lastName}</p>
-            <p>${data.email}</p>
-            <p>${data.message}</p>`
+    html: `<p>Cameron,<br/>
+            You have a new message from <i>${data.firstName} ${data.lastName}<i/>, at: ${data.email}<br/>
+            He/She/They did ${data.signMeUp ? "" : "NOT"} sign up for your email list.
+            Here's your message: <br/>
+            ${data.message}</p>`
     };
 
     transporter.sendMail(mailOptions,
