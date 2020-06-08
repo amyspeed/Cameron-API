@@ -76,10 +76,12 @@ app.post('/api/v1', (req,res) => {
     to: EMAIL_TO,
     subject: data.subject,
     html: `<p>Cameron,<br/>
-            You have a new message from <i>${data.firstName} ${data.lastName}<i/>, at: ${data.email}<br/>
-            He/She/They did ${data.signMeUp ? "" : "NOT"} sign up for your email list.
+            You have a new message from <i>${data.firstName} ${data.lastName}</i>, at: ${data.email}<br/>
+            ${data.firstName} is interested in ${data.subject}.<br/>
+            ${data.firstName} ${data.signMeUp ? "SIGNED UP" : "DID NOT sign up"} for your email list.<br/>
             Here's your message: <br/>
-            ${data.message}</p>`
+            ${data.message}<br/>
+            Love Always,<br/>Your Website</p>`
     };
 
     transporter.sendMail(mailOptions,
