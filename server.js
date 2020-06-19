@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 
 const cors = require('cors');
 
-const { PORT, EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_TO, MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID } = require('./config');
+const { PORT, EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_TO, EMAIL_TO_AMY, MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID } = require('./config');
 
 const Mailchimp = require('mailchimp-api-v3');
 
@@ -104,6 +104,71 @@ app.post('/api/v1', (req,res) => {
     });
 });
 
+// THIS IS THE BEGINNINGS OF A SWITCH TO MAILGUN
+
+// app.post('/api/v2', (req,res) => {
+//     var API_KEY = 'API KEY HERE';
+//     // var DOMAIN = 'YOUR_DOMAIN_NAME';
+//     var mailgun = require('mailgun-js')({apiKey: API_KEY});
+
+//     const data = {
+//         from: 'Excited User <me@samples.mailgun.org>',
+//         to: 'amy.speed.henly@gmail.com',
+//         subject: 'Hello',
+//         text: 'Testing some Mailgun awesomeness!'
+//     };
+
+//     mailgun.messages().send(data, (error, body) => {
+//         console.log(body);
+//     });
+// });
+
+
+app.post('/api/email-amy', (req,res) => {
+    const data = req.body;
+
+    // Send the email to Amy
+    let transporter = nodemailer.createTransport({
+        host: EMAIL_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+            user: EMAIL_USER,
+            pass: EMAIL_PASS
+        }
+    });
+
+    const mailOptions = {
+    from: data.email,
+    to: EMAIL_TO_AMY,
+    subject: `From Website: ${data.subject}`,
+    html: `<p>Amy,<br/>
+            You have a new message from <i>${data.firstName} ${data.lastName}</i>, at: ${data.email}<br/>
+            ${data.firstName} is interested in <strong>${data.subject}</strong>.<br/>
+            Here's your message: <br/>
+            <strong>${data.message}</strong><br/>
+            <br/>
+            Love Always,<br/>Your Website</p>`
+    };
+
+    transporter.sendMail(mailOptions,
+        (error, response) => {
+            if (error) {
+                console.log(data);
+                console.log(mailOptions);
+                console.log('ERROR')
+                console.log(error)
+                res.send(error)
+            }
+            else {
+                console.log(data);
+                console.log(mailOptions);
+                console.log('SUCCESS')
+                res.send('Success')
+            }
+        transporter.close();
+    });
+});
 
 
 app.use('*', function (req, res) {
